@@ -1,6 +1,4 @@
-# Demo-Start: These are the starter files for the Angular Reactive Forms demo form.
-
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.0.1.
+# ng-reactive-forms: these are the starter files for the Angular Reactive Forms demo form.
 
 ## Development server
 
