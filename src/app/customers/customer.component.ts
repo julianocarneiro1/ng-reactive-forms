@@ -1,12 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 
 import { Customer } from './customer';
 
-//must receive a formControl or a FormGroup - AbstractControl allows both
-function ratingRange(c: AbstractControl): { [key: string]: boolean } | null {
-  if (c.value !== null && (isNaN(c.value) || c.value < 1 || c.value > 5)) {
-    return { 'range': true }
+function ratingRange(min: number, max: number): ValidatorFn {
+  //AbstractControl allows a formControl or FormGroup to be received
+  return (c: AbstractControl): { [key: string]: boolean } | null => {
+    if (c.value !== null && (isNaN(c.value) || c.value < min || c.value > max)) {
+      return { 'range': true } //case invalid, true to add to the list of validation errors
+    }
+    return null //case valid, return null
   }
 }
 
@@ -28,7 +31,7 @@ export class CustomerComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       phone: '',
       notification: 'email',
-      rating: [null, ratingRange],
+      rating: [null, ratingRange(1, 5)],
       sendCatalog: true
     })
   }
@@ -57,7 +60,7 @@ export class CustomerComponent implements OnInit {
 
   setNotification(notifyVia: string): void {
     const phoneControl = this.customerForm.get('phone')
-    if(notifyVia === 'text') {
+    if (notifyVia === 'text') {
       phoneControl.setValidators(Validators.required)
     } else {
       phoneControl.clearValidators()
