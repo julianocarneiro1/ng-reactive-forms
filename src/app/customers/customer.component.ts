@@ -7,11 +7,11 @@ function emailMatcher(c: AbstractControl): { [key: string]: boolean } | null {
   const emailControl = c.get('email')
   const confirmControl = c.get('confirmEmail')
 
-  if(emailControl.pristine || confirmControl.pristine) {
+  if (emailControl.pristine || confirmControl.pristine) {
     return null
   }
 
-  if(emailControl.value === confirmControl.value) {
+  if (emailControl.value === confirmControl.value) {
     return null
   }
   return { 'match': true }
@@ -35,6 +35,12 @@ function ratingRange(min: number, max: number): ValidatorFn {
 export class CustomerComponent implements OnInit {
   customerForm: FormGroup
   customer = new Customer();
+  emailMessage: string
+
+  private validationMessages = {
+    required: 'Please enter your email address.',
+    email: 'Please enter a valid email address.'
+  }
 
   constructor(private fb: FormBuilder) { }
 
@@ -45,7 +51,7 @@ export class CustomerComponent implements OnInit {
       emailGroup: this.fb.group({
         email: ['', [Validators.required, Validators.email]],
         confirmEmail: ['', Validators.required],
-      }, {validator: emailMatcher}),      
+      }, { validator: emailMatcher }),
       phone: '',
       notification: 'email',
       rating: [null, ratingRange(1, 5)],
@@ -55,7 +61,15 @@ export class CustomerComponent implements OnInit {
     this.customerForm.get('notification').valueChanges.subscribe(
       value => this.setNotification(value)
     )
+
+    const emailControl = this.customerForm.get('emailGroup.email')
+
+    emailControl.valueChanges.subscribe(
+      value => this.setMessage(emailControl)
+    )
   }
+
+
 
   populateTestDataSet(): void {
     this.customerForm.setValue({
@@ -77,6 +91,14 @@ export class CustomerComponent implements OnInit {
   save(): void {
     console.log(this.customerForm);
     console.log('Saved: ' + JSON.stringify(this.customerForm.value));
+  }
+
+  setMessage(c: AbstractControl): void {
+    this.emailMessage = ''
+    if ((c.touched || c.dirty) && c.errors) {
+      this.emailMessage = Object.keys(c.errors).map(
+        key => this.validationMessages[key]).join(' ')
+    }
   }
 
   setNotification(notifyVia: string): void {
