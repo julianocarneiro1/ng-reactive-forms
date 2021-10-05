@@ -1,4 +1,4 @@
-# ng-reactive-forms: these are the starter files for the Angular Reactive Forms demo form.
+# ng-reactive-forms
 
 ## Development server
 
